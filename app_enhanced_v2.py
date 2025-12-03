@@ -4,7 +4,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
-from langchain.chains import RetrievalQA
+# Import RetrievalQA directly from its module to avoid heavy __init__ side-effects
+from langchain.chains.retrieval_qa.base import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 import os
 from dotenv import load_dotenv
