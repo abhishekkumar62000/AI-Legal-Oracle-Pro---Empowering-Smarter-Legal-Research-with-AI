@@ -8,15 +8,8 @@ from datetime import datetime
 try:
     from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 except Exception:
-    # Fallback: import directly from specific modules to avoid package-level side effects
-    try:
-        from langchain.chat_models.openai import ChatOpenAI
-    except Exception:
-        from langchain.chat_models import ChatOpenAI
-    try:
-        from langchain.embeddings.openai import OpenAIEmbeddings
-    except Exception:
-        from langchain.embeddings import OpenAIEmbeddings
+    st.error("Missing dependency: langchain-openai. Ensure requirements.txt installs langchain-openai on Streamlit Cloud.")
+    st.stop()
 import os
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -27,7 +20,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 try:
     from langchain_community.vectorstores import FAISS
 except Exception:
-    from langchain.vectorstores import FAISS
+    st.error("Missing dependency: langchain-community. Ensure requirements.txt installs langchain-community on Streamlit Cloud.")
+    st.stop()
 
 
 # Vibrant Gradient UI/UX CSS and button animations
