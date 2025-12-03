@@ -22,7 +22,11 @@ except Exception:
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain_community.vectorstores import FAISS
+FAISS_AVAILABLE = True
+try:
+    from langchain_community.vectorstores import FAISS
+except Exception:
+    FAISS_AVAILABLE = False
 
 
 # Vibrant Gradient UI/UX CSS and button animations
@@ -221,6 +225,23 @@ class CitationExtractor:
         citations['clauses'] = re.findall(clause_pattern, text)
 
         return citations
+
+# --------- Fallback retriever when FAISS is unavailable ---------
+class SimpleRetriever:
+    def __init__(self, texts):
+        self.texts = texts or []
+    def get_relevant_documents(self, query, k=4):
+        q = (query or "").lower()
+        # simple scoring by count of query words present
+        words = [w for w in re.findall(r"[A-Za-z0-9]+", q) if len(w) > 2]
+        scored = []
+        for t in self.texts:
+            tl = t.lower()
+            score = sum(1 for w in words if w in tl)
+            scored.append((score, t))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        top = [type("Doc", (), {"page_content": s[1]}) for s in scored[:k]]
+        return top
 
 # ==================== FEATURE 2: MULTI-DOCUMENT COMPARISON ====================
 class DocumentComparator:
@@ -687,7 +708,11 @@ if mode == "📚 Document Analysis":
                         st.error("OPENAI_API_KEY not found. Set it in Streamlit Secrets or .env.")
                         st.stop()
                     embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=openai_api_key)
-                    vector_store = FAISS.from_texts(chunks, embedding=embeddings)
+                    if FAISS_AVAILABLE:
+                        vector_store = FAISS.from_texts(chunks, embedding=embeddings)
+                    else:
+                        st.warning("FAISS not available. Using a simple fallback retriever.")
+                        vector_store = {"fallback_texts": chunks}
                     
                     # Extract citations
                     citation_extractor = CitationExtractor()
@@ -832,8 +857,12 @@ elif mode == "💬 Legal Chat":
                     # Create LLM
                     llm = ChatOpenAI(model=model, temperature=0.1)
                     # Retrieve relevant docs
-                    retriever = st.session_state.vector_store.as_retriever(search_kwargs={"k": 4})
-                    docs = retriever.get_relevant_documents(user_query)
+                    if hasattr(st.session_state.vector_store, "as_retriever"):
+                        retriever = st.session_state.vector_store.as_retriever(search_kwargs={"k": 4})
+                        docs = retriever.get_relevant_documents(user_query)
+                    else:
+                        texts = st.session_state.vector_store.get("fallback_texts", [])
+                        docs = SimpleRetriever(texts).get_relevant_documents(user_query, k=4)
                     context = "\n\n".join([d.page_content for d in docs])
                     prompt = (
                         "You are a legal assistant. Use the provided context to answer the user's question.\n"
@@ -1318,9 +1347,13 @@ if mode == "🔎 Semantic Search & Q&A":
     query = st.text_input("Enter your legal question or search query:")
     if query and st.session_state.docs_processed:
         with st.spinner("Searching and analyzing..."):
-            retriever = st.session_state.vector_store.as_retriever(search_kwargs={"k": 5})
+            if hasattr(st.session_state.vector_store, "as_retriever"):
+                retriever = st.session_state.vector_store.as_retriever(search_kwargs={"k": 5})
+                docs = retriever.get_relevant_documents(query)
+            else:
+                texts = st.session_state.vector_store.get("fallback_texts", [])
+                docs = SimpleRetriever(texts).get_relevant_documents(query, k=5)
             llm = ChatOpenAI(model=model, temperature=0.1)
-            docs = retriever.get_relevant_documents(query)
             context = "\n\n".join([d.page_content for d in docs])
             prompt = (
                 "You are a legal assistant. Use the provided context to answer the user's query succinctly.\n"
