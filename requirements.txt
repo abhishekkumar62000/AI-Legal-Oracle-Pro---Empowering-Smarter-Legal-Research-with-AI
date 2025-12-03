@@ -5,11 +5,4 @@ pandas
 plotly
 networkx
 openai
-
 python-dotenv==1.0.0
-
-
-faiss-cpu==1.7.4
-
-# Text Processing (already included with Python)
-# No additional installs needed for regex
