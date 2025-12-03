@@ -1,9 +1,0 @@
-streamlit
-PyPDF2
-langchain==0.0.350
-langchain-community==0.0.17
-pandas
-plotly
-networkx
-openai
-python-dotenv==1.0.0
