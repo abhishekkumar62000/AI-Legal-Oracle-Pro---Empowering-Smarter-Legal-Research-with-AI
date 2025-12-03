@@ -17,11 +17,7 @@ import re
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-try:
-    from langchain_community.vectorstores import FAISS
-except Exception:
-    st.error("Missing dependency: langchain-community. Ensure requirements.txt installs langchain-community on Streamlit Cloud.")
-    st.stop()
+from langchain_community.vectorstores import FAISS
 
 
 # Vibrant Gradient UI/UX CSS and button animations
