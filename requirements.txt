@@ -1,7 +1,7 @@
 streamlit
 PyPDF2
 langchain==0.0.350
-langchain-community
+langchain-community==0.0.17
 pandas
 plotly
 networkx
