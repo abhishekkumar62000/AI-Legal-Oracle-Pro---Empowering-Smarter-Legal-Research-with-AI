@@ -1,9 +1,19 @@
-streamlit
-PyPDF2
-langchain==0.0.350
-langchain-community==0.0.17
-pandas
-plotly
-networkx
-openai
+streamlit>=1.28.0
+PyPDF2==3.0.1
+# Use split packages to avoid heavy imports
+langchain-openai>=0.1.0
+langchain-community>=0.0.10
+langchain-text-splitters>=0.0.1
+# OpenAI SDK optional (not directly used when using langchain_openai)
+openai>=1.3.0
 python-dotenv==1.0.0
+faiss-cpu==1.7.4
+pandas>=2.1.3
+plotly>=5.18.0
+networkx>=3.2.1
+# For DOCX reading (python-docx provides 'docx' module)
+python-docx==1.1.0
+# Tokenizer often required by embeddings
+tiktoken>=0.5.2
+
+# Note: If deploying on Streamlit Cloud, set OPENAI_API_KEY in Secrets.
