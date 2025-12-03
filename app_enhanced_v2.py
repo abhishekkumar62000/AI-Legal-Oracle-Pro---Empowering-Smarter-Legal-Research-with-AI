@@ -8,8 +8,15 @@ from datetime import datetime
 try:
     from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 except Exception:
-    from langchain.chat_models import ChatOpenAI
-    from langchain.embeddings import OpenAIEmbeddings
+    # Fallback: import directly from specific modules to avoid package-level side effects
+    try:
+        from langchain.chat_models.openai import ChatOpenAI
+    except Exception:
+        from langchain.chat_models import ChatOpenAI
+    try:
+        from langchain.embeddings.openai import OpenAIEmbeddings
+    except Exception:
+        from langchain.embeddings import OpenAIEmbeddings
 import os
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
