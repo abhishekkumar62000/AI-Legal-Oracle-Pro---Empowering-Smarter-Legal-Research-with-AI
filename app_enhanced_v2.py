@@ -4,9 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
-# Import RetrievalQA directly from its module to avoid heavy __init__ side-effects
-from langchain.chains.retrieval_qa.base import RetrievalQA
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 import os
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -14,9 +12,7 @@ import re
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain.embeddings import OpenAIEmbeddings
-
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 
 
 # Vibrant Gradient UI/UX CSS and button animations
@@ -567,6 +563,16 @@ with st.sidebar:
     st.metric("Total Queries", len(st.session_state.chat_history))
     st.metric("Documents", len(st.session_state.all_documents))
 
+    # API key status indicator for deployment sanity check
+    try:
+        api_key_present = bool(st.secrets.get("OPENAI_API_KEY")) or bool(os.getenv("OPENAI_API_KEY"))
+    except Exception:
+        api_key_present = bool(os.getenv("OPENAI_API_KEY"))
+    if api_key_present:
+        st.success("🔑 OpenAI key detected")
+    else:
+        st.warning("🔑 OpenAI key missing. Set in Secrets or .env")
+
     # Sidebar developer footer (placed near bottom of sidebar)
     st.markdown("---")
     st.markdown("#### Developer")
@@ -665,7 +671,7 @@ if mode == "📚 Document Analysis":
                     if not openai_api_key:
                         st.error("OPENAI_API_KEY not found. Set it in Streamlit Secrets or .env.")
                         st.stop()
-                    embeddings = OpenAIEmbeddings(model="text-embedding-3-small", openai_api_key=openai_api_key)
+                    embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=openai_api_key)
                     vector_store = FAISS.from_texts(chunks, embedding=embeddings)
                     
                     # Extract citations
@@ -808,45 +814,33 @@ elif mode == "💬 Legal Chat":
         if user_query:
             with st.spinner("🤔 Analyzing..."):
                 try:
-                    # Create QA chain
-                    llm = ChatOpenAI(
-                        model_name=model,
-                        temperature=0.1,
-                        timeout=30
+                    # Create LLM
+                    llm = ChatOpenAI(model=model, temperature=0.1)
+                    # Retrieve relevant docs
+                    retriever = st.session_state.vector_store.as_retriever(search_kwargs={"k": 4})
+                    docs = retriever.get_relevant_documents(user_query)
+                    context = "\n\n".join([d.page_content for d in docs])
+                    prompt = (
+                        "You are a legal assistant. Use the provided context to answer the user's question.\n"
+                        "If the answer is not in the context, say you are unsure.\n\n"
+                        f"Context:\n{context}\n\nQuestion: {user_query}\nAnswer:"
                     )
-                    
-                    retriever = st.session_state.vector_store.as_retriever(
-                        search_kwargs={"k": 4}
-                    )
-                    
-                    qa_chain = RetrievalQA.from_chain_type(
-                        llm=llm,
-                        chain_type="stuff",
-                        retriever=retriever,
-                        return_source_documents=True
-                    )
-                    
-                    # Get answer
-                    result = qa_chain({"query": user_query})
-                    
+                    result_text = llm.invoke(prompt).content
                     # Display answer
                     st.markdown("### 🤖 Answer:")
-                    st.write(result["result"])
-                    
+                    st.write(result_text)
                     # Show sources
                     with st.expander("📚 Source Documents"):
-                        for idx, doc in enumerate(result["source_documents"], 1):
+                        for idx, doc in enumerate(docs, 1):
                             st.markdown(f"**Source {idx}:**")
                             st.text(doc.page_content[:300] + "...")
                             st.divider()
-                    
                     # Save to history
                     st.session_state.chat_history.append({
                         "time": datetime.now().strftime("%H:%M:%S"),
                         "question": user_query,
-                        "answer": result["result"]
+                        "answer": result_text
                     })
-                    
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
         
@@ -1008,7 +1002,7 @@ elif mode == "📑 Compare Documents":
                         api_key_cmp = None
                     if not api_key_cmp:
                         api_key_cmp = os.getenv("OPENAI_API_KEY")
-                    comparator_embeddings = OpenAIEmbeddings(model="text-embedding-3-small", openai_api_key=api_key_cmp) if api_key_cmp else None
+                    comparator_embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=api_key_cmp) if api_key_cmp else None
                     comparator = DocumentComparator(comparator_embeddings)
                     
                     all_texts = [st.session_state.all_documents[doc] for doc in selected_docs]
@@ -1310,18 +1304,19 @@ if mode == "🔎 Semantic Search & Q&A":
     if query and st.session_state.docs_processed:
         with st.spinner("Searching and analyzing..."):
             retriever = st.session_state.vector_store.as_retriever(search_kwargs={"k": 5})
-            llm = ChatOpenAI(model_name=model, temperature=0.1, timeout=30)
-            qa_chain = RetrievalQA.from_chain_type(
-                llm=llm,
-                chain_type="stuff",
-                retriever=retriever,
-                return_source_documents=True
+            llm = ChatOpenAI(model=model, temperature=0.1)
+            docs = retriever.get_relevant_documents(query)
+            context = "\n\n".join([d.page_content for d in docs])
+            prompt = (
+                "You are a legal assistant. Use the provided context to answer the user's query succinctly.\n"
+                "Cite relevant sections if present. If unsure, say so.\n\n"
+                f"Context:\n{context}\n\nQuery: {query}\nAnswer:"
             )
-            result = qa_chain({"query": query})
+            answer = llm.invoke(prompt).content
             st.markdown("### 🤖 Answer:")
-            st.write(result["result"])
+            st.write(answer)
             with st.expander("📚 Source Documents"):
-                for idx, doc in enumerate(result["source_documents"], 1):
+                for idx, doc in enumerate(docs, 1):
                     st.markdown(f"**Source {idx}:**")
                     st.text(doc.page_content[:300] + "...")
 
