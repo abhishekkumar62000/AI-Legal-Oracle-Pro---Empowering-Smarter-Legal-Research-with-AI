@@ -1,13 +1,18 @@
+<img width="734" height="658" alt="logo" src="https://github.com/user-attachments/assets/38bd0515-f6fb-42be-a213-1b86653ca699" />
+<img width="1916" height="1080" alt="App page" src="https://github.com/user-attachments/assets/feffad63-0e88-4f27-abe2-78e29ccf37e5" />
+
+
+
+##App Demo:--
+
+https://github.com/user-attachments/assets/df1e490d-ec56-4fbc-a175-dd10172e9825
+
 
 ---
 
 # ⚖️ **AI Legal Oracle Pro**
 
 ### **Empowering Smarter Legal Research with AI Agents**
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/6283838c-8640-4f22-87d4-6d4bfcbbb093" width="120">
-</p>
 
 ### **🔗 Live App:**
 
@@ -474,3 +479,57 @@ AI Legal Oracle Pro (Main App)
 [events] [plot] [templates] [review]
 
 ---
+## ❤️ **Made with Passion by Abhishek Yadav & Open-Source Contributors!** 🚀✨
+
+
+<h1 align="center">© LICENSE <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Symbols/Check%20Box%20With%20Check.webp" alt="Check Box With Check" width="25" height="25" /></h1>
+
+<table align="center">
+  <tr>
+     <td>
+       <p align="center"> <img src="https://github.com/malivinayak/malivinayak/blob/main/LICENSE-Logo/MIT.png?raw=true" width="80%"></img>
+    </td>
+    <td> 
+      <img src="https://img.shields.io/badge/License-MIT-yellow.svg"/> <br> 
+This project is licensed under <a href="./LICENSE">MIT</a>. <img width=2300/>
+    </td>
+  </tr>
+</table>
+
+<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="900">
+
+
+
+
+ <hr>
+
+<div align="center">
+<a href="#"><img src="assets/githubgif.gif" width="150"></a>
+	
+### **Thanks for checking out my GitHub Profile!**  
+
+ ## 💌 Sponser
+
+  [![BuyMeACoffee](https://img.buymeacoffee.com/button-api/?text=Buymeacoffee&emoji=&slug=codingstella&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/abhishekkumar62000)
+
+## 👨‍💻 Developer Information  
+**Created by:** **Abhishek Kumar**  
+**📧 Email:** [abhiydv23096@gmail.com](mailto:abhiydv23096@gmail.com)  
+**🔗 LinkedIn:** [Abhishek Kumar](https://www.linkedin.com/in/abhishek-kumar-70a69829a/)  
+**🐙 GitHub Profile:** [@abhishekkumar62000](https://github.com/abhishekkumar62000)
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6283838c-8640-4f22-87d4-6d4bfcbbb093" width="120" style="border-radius: 50%;">
+</p>
+</div>  
+
+
+`Don't forget to give A star to this repository ⭐`
+
+
+`👍🏻 All Set! 💌`
+
+</div>
+
+---
+
