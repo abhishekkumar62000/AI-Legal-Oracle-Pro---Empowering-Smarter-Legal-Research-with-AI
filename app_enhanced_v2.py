@@ -14,6 +14,11 @@ import os
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 import re
+try:
+    import docx  # python-docx package provides this module
+    DOCX_AVAILABLE = True
+except Exception:
+    DOCX_AVAILABLE = False
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -577,6 +582,8 @@ with st.sidebar:
         st.success("🔑 OpenAI key detected")
     else:
         st.warning("🔑 OpenAI key missing. Set in Secrets or .env")
+    if not DOCX_AVAILABLE:
+        st.warning("📄 python-docx not installed. DOCX processing will be skipped.")
 
     # Sidebar developer footer (placed near bottom of sidebar)
     st.markdown("---")
@@ -638,7 +645,10 @@ if mode == "📚 Document Analysis":
                 try:
                     all_text = ""
                     progress_bar = st.progress(0)
-                    from docx import Document
+                    if not DOCX_AVAILABLE:
+                        st.info("DOCX support not available. Install python-docx to process .docx files.")
+                    else:
+                        from docx import Document
                     for idx, file in enumerate(uploaded_files):
                         doc_text = ""
                         if file.name.lower().endswith('.pdf'):
