@@ -4,7 +4,12 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+# Robust imports: prefer split packages, fallback to monolithic langchain if unavailable
+try:
+    from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+except Exception:
+    from langchain.chat_models import ChatOpenAI
+    from langchain.embeddings import OpenAIEmbeddings
 import os
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -12,7 +17,10 @@ import re
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain_community.vectorstores import FAISS
+try:
+    from langchain_community.vectorstores import FAISS
+except Exception:
+    from langchain.vectorstores import FAISS
 
 
 # Vibrant Gradient UI/UX CSS and button animations
